@@ -1,2 +1,4 @@
 # zalihe-app
-Aplikacija za upravljanje kućnim zalihama hrane
+Perfect for multi-lingual families, expats, 
+ or anyone wanting better control over their 
+ household inventory.
