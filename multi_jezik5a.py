@@ -1,83 +1,49 @@
 from pyscript import display, HTML, window
 import pyodide
 
-# 1. VAŠA KOMPLETNA LISTA (Sada je proširena)
-podaci = {
-    "SRB": {
-        "naslov": "ZALIHE DOMAĆINSTVA",
-        "nazad": "⬅️ NAZAD",
-        "kat": ["HRANA", "HIGIJENA", "OSTALO"],
-        "proizvodi": {
-            "HRANA": ["Hleb", "Mleko", "Jaja", "Brašno", "Šećer", "Ulje", "Meso", "Povrće"],
-            "HIGIJENA": ["Sapun", "Šampon", "Pasta za zube", "Deterdžent", "Toalet papir"],
-            "OSTALO": ["Baterije", "Sijalice", "Sveće"]
-        }
-    },
-    "GER": {
-        "naslov": "HAUSHALTSVORRAT",
-        "nazad": "⬅️ ZURÜCK",
-        "kat": ["LEBENSMITTEL", "HYGIENE", "SONSTIGES"],
-        "proizvodi": {
-            "LEBENSMITTEL": ["Brot", "Milch", "Eier", "Mehl", "Zucker", "Öl", "Fleisch", "Gemüse"],
-            "HYGIENE": ["Seife", "Shampoo", "Zahnpasta", "Waschmittel", "Toilettenpapier"],
-            "SONSTIGES": ["Batterien", "Glühbirnen", "Kerzen"]
-        }
-    }
+# 1. PODACI SA KOLIČINAMA (Sada je rečnik sa brojevima)
+zalihe = {
+    "Hleb": 1,
+    "Mleko": 2,
+    "Jaja": 10,
+    "Sapun": 1
 }
 
 trenutni_jezik = "SRB"
 
-# 2. FUNKCIJA ZA PRIKAZ PROIZVODA
-def prikazi_listu(kategorija_index):
-    jezik = podaci[trenutni_jezik]
-    ime_kat = jezik["kat"][kategorija_index]
-    lista = jezik["proizvodi"].get(ime_kat, [])
-    
-    stavke_html = "".join([f"<div style='padding:15px; border-bottom:1px solid #eee; font-size:20px;'>{s}</div>" for s in lista])
+def promeni_kolicinu(stavka, delta):
+    zalihe[stavka] = max(0, zalihe[stavka] + delta)
+    prikazi_listu()
+
+def prikazi_listu():
+    stavke_html = ""
+    for stavka, kolicina in zalihe.items():
+        # Pravimo red sa dugmićima za svaki proizvod
+        stavke_html += f"""
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee;">
+            <span style="font-size: 18px; font-weight: bold;">{stavka}</span>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <button id="minus-{stavka}" style="width:40px; height:40px; border-radius:50%; border:1px solid #ccc; background:#f8f9fa; font-size:20px;">-</button>
+                <span style="font-size: 20px; min-width: 30px; text-align: center;">{kolicina}</span>
+                <button id="plus-{stavka}" style="width:40px; height:40px; border-radius:50%; border:none; background:#28a745; color:white; font-size:20px;">+</button>
+            </div>
+        </div>
+        """
     
     sadrzaj = f"""
-    <div style="font-family: sans-serif; max-width: 400px; margin: auto; background: white; border-radius: 15px; padding: 20px;">
-        <h2 style="text-align: center; color: #007bff;">{ime_kat}</h2>
+    <div style="font-family: sans-serif; max-width: 400px; margin: auto; background: white; border-radius: 15px; padding: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+        <h2 style="text-align: center; color: #333;">📦 STANJE ZALIHA</h2>
         {stavke_html}
-        <button onclick="location.reload()" style="width:100%; margin-top:20px; padding:15px; background:#6c757d; color:white; border:none; border-radius:10px; font-size:18px;">{jezik['nazad']}</button>
+        <p style="text-align:center; color:gray; margin-top:20px; font-size:12px;">Podaci se čuvaju u memoriji aplikacije</p>
     </div>
     """
     display(HTML(sadrzaj), target="python-output", append=False)
 
-# 3. POČETNI EKRAN
-def pocetni_ekran():
-    jezik = podaci[trenutni_jezik]
-    
-    html = f"""
-    <div style="font-family: sans-serif; max-width: 400px; margin: auto; text-align:center;">
-        <h1 style="color:#333; margin-bottom:20px;">🏠 {jezik['naslov']}</h1>
-        
-        <button id="kat0" style="width:100%; margin:10px 0; padding:20px; background:#007bff; color:white; border:none; border-radius:15px; font-size:20px;">🍎 {jezik['kat'][0]}</button>
-        <button id="kat1" style="width:100%; margin:10px 0; padding:20px; background:#28a745; color:white; border:none; border-radius:15px; font-size:20px;">🧼 {jezik['kat'][1]}</button>
-        <button id="kat2" style="width:100%; margin:10px 0; padding:20px; background:#fd7e14; color:white; border:none; border-radius:15px; font-size:20px;">🔧 {jezik['kat'][2]}</button>
-        
-        <div style="margin-top:30px;">
-            <button id="btnSRB" style="padding:10px;">🇷🇸 SRB</button>
-            <button id="btnGER" style="padding:10px;">🇩🇪 GER</button>
-        </div>
-    </div>
-    """
-    display(HTML(html), target="python-output", append=False)
-
-    # POVEZIVANJE DUGMADI
+    # POVEZIVANJE DUGMADI (Za svaku stavku pravimo most)
     from js import document
-    
-    def postavi_jezik(lang):
-        global trenutni_jezik
-        trenutni_jezik = lang
-        pocetni_ekran()
+    for stavka in zalihe.keys():
+        # Moramo koristiti lambda sa default argumentima da bi zapamtili koja je stavka u pitanju
+        document.getElementById(f"minus-{stavka}").onclick = pyodide.ffi.create_proxy(lambda e, s=stavka: promeni_kolicinu(s, -1))
+        document.getElementById(f"plus-{stavka}").onclick = pyodide.ffi.create_proxy(lambda e, s=stavka: promeni_kolicinu(s, 1))
 
-    # Proxy za klikove
-    document.getElementById("kat0").onclick = pyodide.ffi.create_proxy(lambda e: prikazi_listu(0))
-    document.getElementById("kat1").onclick = pyodide.ffi.create_proxy(lambda e: prikazi_listu(1))
-    document.getElementById("kat2").onclick = pyodide.ffi.create_proxy(lambda e: prikazi_listu(2))
-    
-    document.getElementById("btnSRB").onclick = pyodide.ffi.create_proxy(lambda e: postavi_jezik("SRB"))
-    document.getElementById("btnGER").onclick = pyodide.ffi.create_proxy(lambda e: postavi_jezik("GER"))
-
-pocetni_ekran()
+prikazi_listu()
