@@ -2,23 +2,21 @@
 <div id="python-output">
     <py-config>
         [[fetch]]
-        files = ["./multi-jezik5a.py"]
+        files = ["./multi_jezik5a.py"]
     </py-config>
 
     <py-script>
-        # Multilingual Household Supplies App
-        # Python logic is loaded via PyScript
+    # 1. Ispis poruke za korisnika
+    print("📦 Multilingual Household Supplies is starting...")
+    print("Please wait while the application loads.")
 
-        print("📦 Multilingual Household Supplies is starting...")
-        print("Please wait while the application loads.")
-
-        # Debug / environment check
-        import sys
-        print(f"Python version: {sys.version}")
-
-        # Main application logic
-        # You can import or execute code from multi-jezik5a.py here
-    </py-script>
+    # 2. KLJUČNI KORAK: Uvozimo tvoj fajl da bi se pokrenuo
+    try:
+        import multi_jezik5a
+        print("✅ Logika aplikacije je uspešno učitana!")
+    except Exception as e:
+        print(f"❌ Greška pri učitavanju: {e}")
+</py-script>
 </div>
 
 <script src="./install.js"></script>
