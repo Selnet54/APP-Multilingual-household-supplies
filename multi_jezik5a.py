@@ -1,50 +1,83 @@
-from pyscript import display, HTML
+from pyscript import display, HTML, window
 import pyodide
 
-# 1. PODACI
-proizvodi = {
-    "HRANA": ["Hleb", "Mleko", "Jaja", "Brašno", "Šećer", "Ulje"],
-    "HIGIJENA": ["Sapun", "Šampon", "Pasta za zube", "Deterdžent"],
-    "OSTALO": ["Baterije", "Sijalice"]
+# 1. VAŠA KOMPLETNA LISTA (Sada je proširena)
+podaci = {
+    "SRB": {
+        "naslov": "ZALIHE DOMAĆINSTVA",
+        "nazad": "⬅️ NAZAD",
+        "kat": ["HRANA", "HIGIJENA", "OSTALO"],
+        "proizvodi": {
+            "HRANA": ["Hleb", "Mleko", "Jaja", "Brašno", "Šećer", "Ulje", "Meso", "Povrće"],
+            "HIGIJENA": ["Sapun", "Šampon", "Pasta za zube", "Deterdžent", "Toalet papir"],
+            "OSTALO": ["Baterije", "Sijalice", "Sveće"]
+        }
+    },
+    "GER": {
+        "naslov": "HAUSHALTSVORRAT",
+        "nazad": "⬅️ ZURÜCK",
+        "kat": ["LEBENSMITTEL", "HYGIENE", "SONSTIGES"],
+        "proizvodi": {
+            "LEBENSMITTEL": ["Brot", "Milch", "Eier", "Mehl", "Zucker", "Öl", "Fleisch", "Gemüse"],
+            "HYGIENE": ["Seife", "Shampoo", "Zahnpasta", "Waschmittel", "Toilettenpapier"],
+            "SONSTIGES": ["Batterien", "Glühbirnen", "Kerzen"]
+        }
+    }
 }
 
-# 2. FUNKCIJE
-def prikazi_kategoriju(ime):
-    lista = proizvodi.get(ime, [])
+trenutni_jezik = "SRB"
+
+# 2. FUNKCIJA ZA PRIKAZ PROIZVODA
+def prikazi_listu(kategorija_index):
+    jezik = podaci[trenutni_jezik]
+    ime_kat = jezik["kat"][kategorija_index]
+    lista = jezik["proizvodi"].get(ime_kat, [])
+    
     stavke_html = "".join([f"<div style='padding:15px; border-bottom:1px solid #eee; font-size:20px;'>{s}</div>" for s in lista])
     
     sadrzaj = f"""
     <div style="font-family: sans-serif; max-width: 400px; margin: auto; background: white; border-radius: 15px; padding: 20px;">
-        <h2 style="text-align: center; color: #007bff;">📦 {ime}</h2>
+        <h2 style="text-align: center; color: #007bff;">{ime_kat}</h2>
         {stavke_html}
-        <button onclick="location.reload()" style="width:100%; margin-top:20px; padding:15px; background:#6c757d; color:white; border:none; border-radius:10px; font-size:18px;">⬅️ NAZAD</button>
+        <button onclick="location.reload()" style="width:100%; margin-top:20px; padding:15px; background:#6c757d; color:white; border:none; border-radius:10px; font-size:18px;">{jezik['nazad']}</button>
     </div>
     """
     display(HTML(sadrzaj), target="python-output", append=False)
 
-# 3. GLAVNI EKRAN
+# 3. POČETNI EKRAN
 def pocetni_ekran():
-    html = """
-    <div style="font-family: sans-serif; max-width: 400px; margin: auto; text-align:center; padding: 10px;">
-        <h1 style="color:#333; margin-bottom:20px;">🏠 MOJE ZALIHE</h1>
-        <button id="btn1" style="width:100%; margin:10px 0; padding:25px; background:#007bff; color:white; border:none; border-radius:15px; font-size:22px; font-weight:bold;">🍎 HRANA</button>
-        <button id="btn2" style="width:100%; margin:10px 0; padding:25px; background:#28a745; color:white; border:none; border-radius:15px; font-size:22px; font-weight:bold;">🧼 HIGIJENA</button>
-        <button id="btn3" style="width:100%; margin:10px 0; padding:25px; background:#fd7e14; color:white; border:none; border-radius:15px; font-size:22px; font-weight:bold;">🔧 OSTALO</button>
+    jezik = podaci[trenutni_jezik]
+    
+    html = f"""
+    <div style="font-family: sans-serif; max-width: 400px; margin: auto; text-align:center;">
+        <h1 style="color:#333; margin-bottom:20px;">🏠 {jezik['naslov']}</h1>
+        
+        <button id="kat0" style="width:100%; margin:10px 0; padding:20px; background:#007bff; color:white; border:none; border-radius:15px; font-size:20px;">🍎 {jezik['kat'][0]}</button>
+        <button id="kat1" style="width:100%; margin:10px 0; padding:20px; background:#28a745; color:white; border:none; border-radius:15px; font-size:20px;">🧼 {jezik['kat'][1]}</button>
+        <button id="kat2" style="width:100%; margin:10px 0; padding:20px; background:#fd7e14; color:white; border:none; border-radius:15px; font-size:20px;">🔧 {jezik['kat'][2]}</button>
+        
+        <div style="margin-top:30px;">
+            <button id="btnSRB" style="padding:10px;">🇷🇸 SRB</button>
+            <button id="btnGER" style="padding:10px;">🇩🇪 GER</button>
+        </div>
     </div>
     """
-    display(HTML(html), target="python-output")
+    display(HTML(html), target="python-output", append=False)
 
-    # POVEZIVANJE KOJE NE MOŽE DA OMANE
+    # POVEZIVANJE DUGMADI
     from js import document
     
-    # Pravimo "mostove" za svako dugme posebno
-    btn1_proxy = pyodide.ffi.create_proxy(lambda e: prikazi_kategoriju("HRANA"))
-    document.getElementById("btn1").addEventListener("click", btn1_proxy)
+    def postavi_jezik(lang):
+        global trenutni_jezik
+        trenutni_jezik = lang
+        pocetni_ekran()
+
+    # Proxy za klikove
+    document.getElementById("kat0").onclick = pyodide.ffi.create_proxy(lambda e: prikazi_listu(0))
+    document.getElementById("kat1").onclick = pyodide.ffi.create_proxy(lambda e: prikazi_listu(1))
+    document.getElementById("kat2").onclick = pyodide.ffi.create_proxy(lambda e: prikazi_listu(2))
     
-    btn2_proxy = pyodide.ffi.create_proxy(lambda e: prikazi_kategoriju("HIGIJENA"))
-    document.getElementById("btn2").addEventListener("click", btn2_proxy)
-    
-    btn3_proxy = pyodide.ffi.create_proxy(lambda e: prikazi_kategoriju("OSTALO"))
-    document.getElementById("btn3").addEventListener("click", btn3_proxy)
+    document.getElementById("btnSRB").onclick = pyodide.ffi.create_proxy(lambda e: postavi_jezik("SRB"))
+    document.getElementById("btnGER").onclick = pyodide.ffi.create_proxy(lambda e: postavi_jezik("GER"))
 
 pocetni_ekran()
