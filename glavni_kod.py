@@ -1,50 +1,108 @@
 from pyscript import display, HTML
 import pyodide
 
-# 1. VAŠE STAVKE
-zalihe = {
-    "Hleb": 1,
-    "Mleko": 2,
-    "Jaja": 10,
-    "Sapun": 1
+# --- VAŠI PODACI (Skraćeno za primer, vi dodajte sve jezike) ---
+main_cats = {
+    "srpski": ["Belo meso", "Crveno meso", "Hemija i higijena"],
+    "deutsch": ["Weißes Fleisch", "Rotes Fleisch", "Chemie und Hygiene"]
 }
 
-def promeni_kolicinu(stavka, delta):
-    # Povećaj ili smanji, ali ne ispod nule
-    zalihe[stavka] = max(0, zalihe[stavka] + delta)
-    osvezi_ekran()
+sub_cats = {
+    "srpski": {
+        "Belo meso": ["Pileće", "Ćureće"],
+        "Hemija i higijena": ["Lična higijena"]
+    },
+    "deutsch": {
+        "Weißes Fleisch": ["Huhn", "Truthahn"],
+        "Chemie und Hygiene": ["Persönliche Hygiene"]
+    }
+}
 
-def osvezi_ekran():
-    html_sadrzaj = """
-    <div style="font-family: Arial; max-width: 450px; margin: auto; background: #ffffff; padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
-        <h2 style="text-align: center; color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px;">📦 STANJE ZALIHA</h2>
-    """
-    
-    for stavka, kolicina in zalihe.items():
-        html_sadrzaj += f"""
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #f0f0f0;">
-            <span style="font-size: 20px; font-weight: 500; color: #444;">{stavka}</span>
-            <div style="display: flex; align-items: center; gap: 20px;">
-                <button id="minus-{stavka}" style="width: 45px; height: 45px; border-radius: 50%; border: 1px solid #ddd; background: #f8f9fa; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center;">-</button>
-                <b style="font-size: 22px; min-width: 30px; text-align: center;">{kolicina}</b>
-                <button id="plus-{stavka}" style="width: 45px; height: 45px; border-radius: 50%; border: none; background: #28a745; color: white; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center;">+</button>
-            </div>
-        </div>
-        """
-    
-    html_sadrzaj += "</div>"
-    
-    display(HTML(html_sadrzaj), target="python-output", append=False)
+parts = {
+    "srpski": {
+        "Pileće": ["Celo pile", "Batak", "Belo meso"],
+        "Lična higijena": ["Sapun", "Šampon"]
+    },
+    "deutsch": {
+        "Huhn": ["Ganzes Huhn", "Keule", "Brust"],
+        "Persönliche Hygiene": ["Seife", "Shampoo"]
+    }
+}
 
-    # POVEZIVANJE DUGMADI (Ovo omogućava da klik radi)
+# STANJE ZALIHA (Ovo bi u budućnosti išlo u memoriju telefona)
+zalihe = {}
+
+trenutni_jezik = "srpski"
+
+def promeni_kolicinu(artikal, delta):
+    zalihe[artikal] = zalihe.get(artikal, 0) + delta
+    if zalihe[artikal] < 0: zalihe[artikal] = 0
+    prikazi_artikle(trenutna_podkat)
+
+def prikazi_jezike():
+    html = "<div style='text-align:center; padding:20px;'><h1>IZABERITE JEZIK</h1>"
+    for lang in main_cats.keys():
+        html += f'<button id="lang-{lang}" style="width:100%; padding:15px; margin:5px; font-size:20px; border-radius:10px;">{lang.upper()}</button>'
+    html += "</div>"
+    display(HTML(html), target="python-output", append=False)
+    
     from js import document
-    for stavka in zalihe.keys():
-        # Pravimo proxy za svako dugme
-        minus_btn = document.getElementById(f"minus-{stavka}")
-        plus_btn = document.getElementById(f"plus-{stavka}")
-        
-        minus_btn.onclick = pyodide.ffi.create_proxy(lambda e, s=stavka: promeni_kolicinu(s, -1))
-        plus_btn.onclick = pyodide.ffi.create_proxy(lambda e, s=stavka: promeni_kolicinu(s, 1))
+    for lang in main_cats.keys():
+        document.getElementById(f"lang-{lang}").onclick = pyodide.ffi.create_proxy(lambda e, l=lang: postavi_jezik(l))
 
-# Prvo pokretanje
-osvezi_ekran()
+def postavi_jezik(lang):
+    global trenutni_jezik
+    trenutni_jezik = lang
+    prikazi_glavne_kategorije()
+
+def prikazi_glavne_kategorije():
+    html = f"<div style='padding:10px;'><button onclick='location.reload()'>⬅️</button><h2>{trenutni_jezik.upper()}</h2>"
+    for cat in main_cats[trenutni_jezik]:
+        html += f'<button id="cat-{cat}" style="width:100%; padding:20px; margin:5px; background:#007bff; color:white; border-radius:10px; font-size:18px;">{cat}</button>'
+    html += "</div>"
+    display(HTML(html), target="python-output", append=False)
+    
+    from js import document
+    for cat in main_cats[trenutni_jezik]:
+        document.getElementById(f"cat-{cat}").onclick = pyodide.ffi.create_proxy(lambda e, c=cat: prikazi_podkategorije(c))
+
+def prikazi_podkategorije(glavna_kat):
+    html = f"<div style='padding:10px;'><button id='back-to-main'>⬅️ NAZAD</button><h2>{glavna_kat}</h2>"
+    lista = sub_cats[trenutni_jezik].get(glavna_kat, [])
+    for sub in lista:
+        html += f'<button id="sub-{sub}" style="width:100%; padding:20px; margin:5px; background:#28a745; color:white; border-radius:10px; font-size:18px;">{sub}</button>'
+    html += "</div>"
+    display(HTML(html), target="python-output", append=False)
+    
+    from js import document
+    document.getElementById("back-to-main").onclick = pyodide.ffi.create_proxy(lambda e: prikazi_glavne_kategorije())
+    for sub in lista:
+        document.getElementById(f"sub-{sub}").onclick = pyodide.ffi.create_proxy(lambda e, s=sub: prikazi_artikle(s))
+
+def prikazi_artikle(podkat):
+    global trenutna_podkat
+    trenutna_podkat = podkat
+    html = f"<div style='padding:10px;'><button id='back-to-sub'>⬅️ NAZAD</button><h2>{podkat}</h2>"
+    lista_artikala = parts[trenutni_jezik].get(podkat, [])
+    
+    for art in lista_artikala:
+        kol = zalihe.get(art, 0)
+        html += f"""
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; border-bottom:1px solid #ddd;">
+            <span style="font-size:18px;">{art}</span>
+            <div>
+                <button id="m-{art}" style="padding:10px 15px;">-</button>
+                <b style="margin:0 10px; font-size:20px;">{kol}</b>
+                <button id="p-{art}" style="padding:10px 15px; background:green; color:white;">+</button>
+            </div>
+        </div>"""
+    html += "</div>"
+    display(HTML(html), target="python-output", append=False)
+    
+    from js import document
+    document.getElementById("back-to-sub").onclick = pyodide.ffi.create_proxy(lambda e: prikazi_glavne_kategorije())
+    for art in lista_artikala:
+        document.getElementById(f"m-{art}").onclick = pyodide.ffi.create_proxy(lambda e, a=art: promeni_kolicinu(a, -1))
+        document.getElementById(f"p-{art}").onclick = pyodide.ffi.create_proxy(lambda e, a=art: promeni_kolicinu(a, 1))
+
+prikazi_jezike()
