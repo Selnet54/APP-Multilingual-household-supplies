@@ -3,40 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Household Supplies</title>
-    
+    <title>Zalihe</title>
     <link rel="manifest" href="./manifest.json">
-    <link rel="icon" href="icons/icon-192.png">
-
     <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
     <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
 </head>
-<body>
+<body style="background-color: #f0f2f5; font-family: sans-serif;">
 
-    <div style="text-align: center; margin: 20px;">
-        <button id="installBtn" style="display:none; padding: 15px; background-color: #4CAF50; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">
-            📲 Instaliraj aplikaciju
+    <div id="main-container" style="text-align: center; padding: 20px;">
+        <button id="installBtn" style="display:none; width:100%; padding:15px; background: #28a745; color:white; border:none; border-radius:10px; margin-bottom:20px; font-weight:bold;">
+            📲 INSTALIRAJ NA TELEFON
         </button>
+
+        <div id="python-output"></div>
     </div>
 
-    <div id="python-output">
-    <<py-config>
-       [[fetch]]
-       files = ["./multi_jezik5a.py"]
-       packages = ["sqlite3"]
+    <py-config>
+        [[fetch]]
+        files = ["./multi_jezik5a.py"]
     </py-config>
-    <py-script>
-        print("📦 Multilingual Household Supplies is starting...")
-        print("Please wait while the application loads.")
 
-        try:
-            import multi_jezik5a
-            print("✅ Logika aplikacije je uspešno učitana!")
-        except Exception as e:
-            print(f"❌ Greška pri učitavanju: {e}")
-    </py-script>
-</div>
-
+    <py-script src="./multi_jezik5a.py"></py-script>
     <script src="./install.js"></script>
 </body>
 </html>
