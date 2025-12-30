@@ -2,7 +2,7 @@
   "name": "Zalihe App",
   "short_name": "Zalihe",
   "description": "Aplikacija za upravljanje zalihama hrane",
-  "start_url": "./index.html",
+  "start_url": "./language.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#ffffff",
