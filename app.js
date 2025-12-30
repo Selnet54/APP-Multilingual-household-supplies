@@ -1,44 +1,37 @@
-document.getElementById("unosForma").addEventListener("submit", function (e) {
-  e.preventDefault();
-
-  const proizvod = {
-    naziv: document.getElementById("naziv").value.trim(),
-    kolicina: document.getElementById("kolicina").value,
-    jedinica: document.getElementById("jedinica").value,
-    rok: document.getElementById("rok").value,
-    mesto: document.getElementById("mesto").value,
-    vreme: new Date().toISOString()
-  };
-
-  const tx = db.transaction("zalihe", "readwrite");
-  const store = tx.objectStore("zalihe");
-  store.add(proizvod);
-
-  tx.oncomplete = () => {
-    document.getElementById("unosForma").reset();
-    prikaziZalihe();
-  };
-});
-
-function prikaziZalihe() {
-  const lista = document.getElementById("lista");
-  lista.innerHTML = "";
-
-  const tx = db.transaction("zalihe", "readonly");
-  const store = tx.objectStore("zalihe");
-
-  store.openCursor().onsuccess = event => {
-    const cursor = event.target.result;
-    if (cursor) {
-      const p = cursor.value;
-
-      const li = document.createElement("li");
-      li.textContent =
-        `${p.naziv} – ${p.kolicina} ${p.jedinica} | ${p.mesto}` +
-        (p.rok ? ` | Rok: ${p.rok}` : "");
-
-      lista.appendChild(li);
-      cursor.continue();
-    }
-  };
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zalihe App</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<script>
+if (localStorage.getItem("ok") !== "1") {
+    window.location.href = "index.html";
 }
+</script>
+<h2>Zalihe hrane</h2>
+<form id="unosForma">
+    <label for="naziv">Naziv proizvoda:</label>
+    <input type="text" id="naziv" placeholder="Unesite naziv" required>
+    <label for="kolicina">Količina:</label>
+    <input type="number" id="kolicina" placeholder="Unesite količinu" required>
+    <label for="jedinica">Jedinica:</label>
+    <select id="jedinica" required>
+        <option value="kom">kom</option>
+        <option value="kg">kg</option>
+        <option value="l">l</option>
+    </select>
+    <label for="rok">Rok trajanja:</label>
+    <input type="date" id="rok">
+    <label for="mesto">Mesto skladištenja:</label>
+    <input type="text" id="mesto" placeholder="Unesite mesto">
+    <button type="submit">Sačuvaj</button>
+</form>
+<ul id="lista"></ul>
+<script src="db.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
