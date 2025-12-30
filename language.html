@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Izbor jezika</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h2>Izaberite jezik / Choose Language</h2>
+
+    <div id="languageButtons">
+        <button data-lang="sr">Srpski</button>
+        <button data-lang="en">English</button>
+        <button data-lang="hu">Magyar</button>
+        <button data-lang="de">Deutsch</button>
+        <button data-lang="fr">Français</button>
+        <button data-lang="es">Español</button>
+        <button data-lang="pt">Português</button>
+        <button data-lang="ru">Русский</button>
+        <button data-lang="zh">中文</button>
+        <button data-lang="uk">Українська</button>
+    </div>
+
+    <script>
+        const buttons = document.querySelectorAll('#languageButtons button');
+
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const lang = btn.dataset.lang;
+                localStorage.setItem('language', lang); // čuvamo izabrani jezik
+                window.location.href = "index.html"; // vodi na ekran za unos koda
+            });
+        });
+
+        // Ako je jezik već izabran, preskoči ekran
+        if (localStorage.getItem('language')) {
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>
