@@ -1,24 +1,12 @@
-{
-  "name": "Multilingual Household Supplies",
-  "short_name": "Supplies",
-  "description": "Perfect for multi-lingual families, expats, or anyone wanting better control over their household inventory.",
-  "start_url": "./index.html",
-  "scope": "./",
-  "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#4CAF50",
-  "icons": [
-    {
-      "src": "icons/192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "icons/512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ]
-}
+"icons": [
+  {
+    "src": "icons/512.jpg",
+    "sizes": "512x512",
+    "type": "image/jpeg"
+  },
+  {
+    "src": "icons/192.jpg",
+    "sizes": "192x192",
+    "type": "image/jpeg"
+  }
+]
