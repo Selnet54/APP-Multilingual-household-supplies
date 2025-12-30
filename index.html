@@ -1,23 +1,36 @@
-<input id="code" placeholder="Unesite kod">
-<button onclick="unlock()">Pokreni</button>
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zalihe App - Pristup</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h2>Unesite kod za pristup aplikaciji</h2>
 
-<script>
-function unlock() {
-  const input = document.getElementById("code");
-  const value = input.value.trim();
+    <input id="code" type="text" placeholder="Unesite kod">
+    <button onclick="unlock()">Pokreni</button>
 
-  if (value === "2025") {   // tvoj novi kod
-    localStorage.setItem("ok", "1");
-    window.location.href = "app.html";
-  } else {
-    alert("Pogrešan kod");
-    input.value = "";
-    input.focus();
-  }
-}
+    <script>
+        function unlock() {
+            const input = document.getElementById("code");
+            const value = input.value.trim();
 
-// Ako je već otključano – preskoči unos koda
-if (localStorage.getItem("ok") === "1") {
-  window.location.href = "app.html";
-}
-</script>
+            if (value === "2025") {   // tvoj novi kod
+                localStorage.setItem("ok", "1");
+                window.location.href = "app.html";
+            } else {
+                alert("Pogrešan kod");
+                input.value = "";
+                input.focus();
+            }
+        }
+
+        // Ako je već otključano – preskoči unos koda
+        if (localStorage.getItem("ok") === "1") {
+            window.location.href = "app.html";
+        }
+    </script>
+</body>
+</html>
