@@ -1,88 +1,97 @@
 from pyscript import display, HTML
 import pyodide
+from js import localStorage, document
 
-# --- VAŠI ORIGINALNI PODACI IZ KODA ---
-main_categories = {
+# --- 1. VAŠI ORIGINALNI PODACI (Svi jezici iz multi-jezik5a.py) ---
+main_categories_translations = {
     "srpski": ["Belo meso", "Crveno meso", "Sitna divljač", "Krupna divljač", "Riba", "Mlečni proizvodi", "Povrće", "Zimnica i kompoti", "Testo i Slatkiši", "Pića", "Hemija i higijena", "Ostalo"],
-    "hungary": ["Fehér hús", "Vörös hús", "Apróvad", "Nagyvad", "Hal", "Tejtermékek", "Zöldség", "Befőttek és kompótok", "Tészta és Édességek", "Italok", "Kémia i higiénia", "Egyéb"]
-    # ... ovde ćemo dodati i ostale jezike koje ste poslali
+    "hungary": ["Fehér hús", "Vörös hús", "Apróvad", "Nagyvad", "Hal", "Tejtermékek", "Zöldség", "Befőttek és kompótok", "Tészta és Édességek", "Italok", "Kémia i higiénia", "Egyéb"],
+    "ukrajinski": ["Біле м'ясо", "Червоне м'ясо", "Дрібна дичина", "Велика дичина", "Риба", "Молочні продукти", "Овочі", "Заготовки та компоти", "Тісто та солодощі", "Напої", "Хімія та гігієна", "Інше"],
+    "ruski": ["Белое мясо", "Красное мясо", "Мелкая дичь", "Крупная дичь", "Рыба", "Молочные продукты", "Овощи", "Заготовки и компоты", "Тесто и сладости", "Напитки", "Химия и гигиена", "Прочее"],
+    "english": ["White meat", "Red meat", "Small game", "Big game", "Fish", "Dairy products", "Vegetables", "Pickles and compotes", "Dough and Sweets", "Drinks", "Chemistry and hygiene", "Other"],
+    "deutsch": ["Weißes Fleisch", "Rotes Fleisch", "Kleinwild", "Großwild", "Fisch", "Milchprodukte", "Gemüse", "Konserven und Kompotte", "Teig und Süßigkeiten", "Getränke", "Chemie und Hygiene", "Andere"],
+    "mandarinski": ["白肉", "红肉", "小野味", "大野味", "鱼", "乳制品", "蔬菜", "腌菜和蜜饯", "面食和甜点", "饮料", "化学和卫生", "其他"],
+    "espanol": ["Carne blanca", "Carne roja", "Caza menor", "Caza mayor", "Pescado", "Lácteos", "Verduras", "Encurtidos y compotas", "Pasta y dulces", "Bebidas", "Química e higiene", "Otros"],
+    "portugalski": ["Carne branca", "Carne vermelha", "Caça pequena", "Caça grande", "Peixe", "Laticínios", "Vegetais", "Conservas e compotas", "Massas e doces", "Bebidas", "Química e higiene", "Outros"],
+    "francais": ["Viande blanche", "Viande rouge", "Petit gibier", "Grand gibier", "Poisson", "Produits laitiers", "Légumes", "Conserves et compotes", "Pâtes et sucreries", "Boissons", "Chimie et hygiène", "Autres"]
 }
 
-# Koristimo deo vaših podkategorija za test
-sub_categories = {
-    "srpski": {
-        "Belo meso": ["Pileće", "Ćureće", "Guska", "Patka", "Ostalo"],
-        "Crveno meso": ["Svinjsko", "Jagnjeće", "Ovčije", "Juneće", "Govedina", "Konjsko", "Zečije", "Ostalo"],
-        "Hemija i higijena": ["Sanitar", "Lična higijena", "Pribor", "Ostalo"]
-    }
-}
+# --- 2. LOGIKA ZA SKLADIŠTENJE (LocalStorage umesto SQLite) ---
+def get_count(item_name):
+    val = localStorage.getItem(item_name)
+    return int(val) if val else 0
 
-# Koristimo vaše specifične delove proizvoda
-product_parts = {
-    "srpski": {
-        "Pileće": ["Gril pile", "Pile celo", "Ceo batak", "Karabatak", "Belo (grudi)", "File", "Krilca", "Mleveno"],
-        "Svinjsko": ["Šnicla", "Karmenadla", "Vrat", "But", "Kare", "Rebra", "Mleveno"],
-        "Lična higijena": ["Sapun", "Šampon", "Dezodorans", "Brijač"]
-    }
-}
+def update_count(item, delta, subcat):
+    new_val = max(0, get_count(item) + delta)
+    localStorage.setItem(item, str(new_val))
+    prikazi_artikle(subcat)
 
-zalihe = {}
+# --- 3. NAVIGACIJA KROZ APLIKACIJU ---
 trenutni_jezik = "srpski"
 
-def prikazi_glavni_meni():
-    html = "<div style='background:#f8f9fa; padding:15px; border-radius:15px; text-align:center; box-shadow: 0 4px 8px rgba(0,0,0,0.1);'>"
-    html += "<h2 style='color:#333;'>📦 MOJE ZALIHE</h2>"
-    for cat in main_categories[trenutni_jezik]:
-        html += f'<button id="cat-{cat}" style="width:90%; padding:15px; margin:8px; background:#007bff; color:white; border:none; border-radius:10px; font-size:18px; font-weight:bold;">{cat}</button>'
-    html += "</div>"
-    display(HTML(html), target="python-output", append=False)
+def prikazi_jezike():
+    jezici = [
+        ("Srpski", "srpski"), ("Magyar", "hungary"), ("Українська", "ukrajinski"),
+        ("Pусский", "ruski"), ("English", "english"), ("Deutsch", "deutsch"),
+        ("中文", "mandarinski"), ("Español", "espanol"), ("Português", "portugalski"),
+        ("Français", "francais")
+    ]
+    html = '<div class="container">'
+    for ime, kod in jezici:
+        html += f'<button class="btn-lang" id="l-{kod}">{ime}</button>'
+    html += '</div>'
+    document.getElementById("title").innerText = "IZBOR JEZIKA / VÁLASSZ NYELVET"
+    display(HTML(html), target="app-body", append=False)
     
-    from js import document
-    for cat in main_categories[trenutni_jezik]:
-        document.getElementById(f"cat-{cat}").onclick = pyodide.ffi.create_proxy(lambda e, c=cat: prikazi_podkategorije(c))
+    for _, kod in jezici:
+        btn = document.getElementById(f"l-{kod}")
+        btn.onclick = pyodide.ffi.create_proxy(lambda e, k=kod: postavi_jezik(k))
 
-def prikazi_podkategorije(glavna_kat):
-    html = f"<div style='padding:10px;'><button id='nazad' style='background:#6c757d; color:white; border:none; padding:10px; border-radius:5px;'>⬅️ Nazad</button>"
-    html += f"<h3 style='text-align:center;'>{glavna_kat}</h3>"
-    
-    lista = sub_categories[trenutni_jezik].get(glavna_kat, ["Ostalo"])
-    for sub in lista:
-        html += f'<button id="sub-{sub}" style="width:90%; padding:15px; margin:8px; background:#28a745; color:white; border:none; border-radius:10px; font-size:17px;">{sub}</button>'
-    html += "</div>"
-    display(HTML(html), target="python-output", append=False)
-    
-    from js import document
-    document.getElementById("nazad").onclick = pyodide.ffi.create_proxy(lambda e: prikazi_glavni_meni())
-    for sub in lista:
-        document.getElementById(f"sub-{sub}").onclick = pyodide.ffi.create_proxy(lambda e, s=sub: prikazi_artikle(s))
+def postavi_jezik(k):
+    global trenutni_jezik
+    trenutni_jezik = k
+    prikazi_glavne_kategorije()
 
-def prikazi_artikle(podkat):
-    html = f"<div style='padding:10px;'><button id='nazad-pod' style='background:#6c757d; color:white; border:none; padding:10px; border-radius:5px;'>⬅️ Nazad</button>"
-    html += f"<h3 style='text-align:center;'>{podkat}</h3>"
+def prikazi_glavne_kategorije():
+    kategorije = main_categories_translations.get(trenutni_jezik, main_categories_translations["srpski"])
+    html = '<div class="container">'
+    for cat in kategorije:
+        html += f'<button class="btn-cat" id="c-{cat}">{cat}</button>'
+    html += '<button class="btn-lang" style="background:#ff4444; color:white; margin-top:20px;" id="nazad-jezici">IZLAZ / BACK</button>'
+    html += '</div>'
+    document.getElementById("title").innerText = trenutni_jezik.upper()
+    display(HTML(html), target="app-body", append=False)
     
-    lista = product_parts[trenutni_jezik].get(podkat, ["Ostalo"])
-    for art in lista:
-        kol = zalihe.get(art, 0)
-        html += f"""
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:15px; background:white; margin-bottom:8px; border-radius:10px; border-left: 5px solid #28a745;">
-            <span style="font-size:18px; font-weight:500;">{art}</span>
-            <div style="display:flex; align-items:center; gap:15px;">
-                <button id="m-{art}" style="width:35px; height:35px; border-radius:50%; border:1px solid #ccc;">-</button>
-                <b style="font-size:20px; min-width:25px; text-align:center;">{kol}</b>
-                <button id="p-{art}" style="width:35px; height:35px; border-radius:50%; background:#28a745; color:white; border:none;">+</button>
+    document.getElementById("nazad-jezici").onclick = pyodide.ffi.create_proxy(lambda e: prikazi_jezike())
+    for cat in kategorije:
+        document.getElementById(f"c-{cat}").onclick = pyodide.ffi.create_proxy(lambda e, c=cat: prikazi_artikle(c))
+
+# Ovo je "srce" - ovde će se prikazivati artikli sa + i -
+def prikazi_artikle(kategorija):
+    # Za demo koristimo par artikala, kasnije ćemo uliti svih 3000
+    artikli = ["Artikal 1", "Artikal 2", "Artikal 3"] # Ovde idu vaši podaci
+    
+    html = '<div class="container">'
+    for art in artikli:
+        count = get_count(art)
+        html += f'''
+        <div class="item-card">
+            <span>{art}</span>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <button id="m-{art}" style="width:40px;height:40px;border-radius:50%; border:1px solid #ccc;">-</button>
+                <b style="min-width:30px; text-align:center;">{count}</b>
+                <button id="p-{art}" style="width:40px;height:40px;border-radius:50%; background:#4CAF50; color:white; border:none;">+</button>
             </div>
-        </div>"""
-    html += "</div>"
-    display(HTML(html), target="python-output", append=False)
+        </div>
+        '''
+    html += f'<button class="btn-lang" id="nazad-glavno">⬅ NAZAD</button>'
+    html += '</div>'
+    document.getElementById("title").innerText = kategorija
+    display(HTML(html), target="app-body", append=False)
     
-    from js import document
-    document.getElementById("nazad-pod").onclick = pyodide.ffi.create_proxy(lambda e: prikazi_glavni_meni())
-    for art in lista:
-        document.getElementById(f"m-{art}").onclick = pyodide.ffi.create_proxy(lambda e, a=art: menjaj(a, -1, podkat))
-        document.getElementById(f"p-{art}").onclick = pyodide.ffi.create_proxy(lambda e, a=art: menjaj(a, 1, podkat))
+    document.getElementById("nazad-glavno").onclick = pyodide.ffi.create_proxy(lambda e: prikazi_glavne_kategorije())
+    for art in artikli:
+        document.getElementById(f"m-{art}").onclick = pyodide.ffi.create_proxy(lambda e, a=art: update_count(a, -1, kategorija))
+        document.getElementById(f"p-{art}").onclick = pyodide.ffi.create_proxy(lambda e, a=art: update_count(a, 1, kategorija))
 
-def menjaj(art, delta, podkat):
-    zalihe[art] = max(0, zalihe.get(art, 0) + delta)
-    prikazi_artikle(podkat)
-
-prikazi_glavni_meni()
+prikazi_jezike()
