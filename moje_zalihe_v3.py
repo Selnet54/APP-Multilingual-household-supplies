@@ -1,6 +1,19 @@
 from pyscript import display, HTML
 import pyodide
 from js import localStorage, document
+# --- 1. NASLOVI ZA PLAVO POLJE (SVIH 10 JEZIKA) ---
+naslovi_izbor_jezika = {
+    "srpski": "IZABERITE JEZIK",
+    "hungary": "VÁLASSZ NYELVET",
+    "ukrajinski": "ВИБЕРІТЬ МОВУ",
+    "ruski": "ВЫБЕРИТЕ ЯЗЫК",
+    "english": "SELECT LANGUAGE",
+    "deutsch": "SPRACHE WÄHLEN",
+    "mandarinski": "选择语言",
+    "espanol": "SELECCIONE IDIOMA",
+    "portugalski": "SELECIONAR IDIOMA",
+    "francais": "CHOISIR LA LANGUE"
+}
 
 # --- 1. VAŠI ORIGINALNI PODACI (Svi jezici iz multi-jezik5a.py) ---
 main_categories_translations = {
