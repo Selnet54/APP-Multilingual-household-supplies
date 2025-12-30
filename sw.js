@@ -1,6 +1,7 @@
 const CACHE_NAME = "zalihe-v1";
 const urlsToCache = [
   "./",
+  "./language.html",
   "./index.html",
   "./app.html",
   "./style.css",
