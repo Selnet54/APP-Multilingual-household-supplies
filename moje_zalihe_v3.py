@@ -30,16 +30,25 @@ def update_count(item, delta, subcat):
 trenutni_jezik = "srpski"
 
 def prikazi_jezike():
+    # Dodali smo emoji zastave direktno uz nazive
     jezici = [
-        ("Srpski", "srpski"), ("Magyar", "hungary"), ("Українська", "ukrajinski"),
-        ("Pусский", "ruski"), ("English", "english"), ("Deutsch", "deutsch"),
-        ("中文", "mandarinski"), ("Español", "espanol"), ("Português", "portugalski"),
-        ("Français", "francais")
+        ("🇷🇸 Srpski", "srpski"), 
+        ("🇭🇺 Magyar", "hungary"), 
+        ("🇺🇦 Українська", "ukrajinski"),
+        ("🇷🇺 Pусский", "ruski"), 
+        ("🇬🇧 English", "english"), 
+        ("🇩🇪 Deutsch", "deutsch"),
+        ("🇨🇳 中文", "mandarinski"), 
+        ("🇪🇸 Español", "espanol"), 
+        ("🇵🇹 Português", "portugalski"),
+        ("🇫🇷 Français", "francais")
     ]
-    html = '<div class="container">'
+    
+    html = '<div class="container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">'
     for ime, kod in jezici:
-        html += f'<button class="btn-lang" id="l-{kod}">{ime}</button>'
+        html += f'<button class="btn-lang" id="l-{kod}" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 15px;">{ime}</button>'
     html += '</div>'
+    
     document.getElementById("title").innerText = "IZBOR JEZIKA / VÁLASSZ NYELVET"
     display(HTML(html), target="app-body", append=False)
     
