@@ -1,12 +1,22 @@
-"icons": [
-  {
-    "src": "icons/512.jpg",
-    "sizes": "512x512",
-    "type": "image/jpeg"
-  },
-  {
-    "src": "icons/192.jpg",
-    "sizes": "192x192",
-    "type": "image/jpeg"
-  }
-]
+{
+  "name": "Zalihe App",
+  "short_name": "Zalihe",
+  "description": "Aplikacija za upravljanje zalihama hrane",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4CAF50",
+  "icons": [
+    {
+      "src": "icons/192.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    },
+    {
+      "src": "icons/512.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
