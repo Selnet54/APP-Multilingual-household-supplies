@@ -2,35 +2,31 @@
 <html lang="sr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zalihe App - Pristup</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Zalihe PWA</title>
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background-color: #E1F5FE; }
+        .header { background-color: #01579B; color: white; text-align: center; padding: 15px; position: sticky; top: 0; z-index: 100; }
+        .container { padding: 10px; display: flex; flex-direction: column; gap: 10px; }
+        .btn-lang { background: white; border: 1px solid #ccc; padding: 20px; border-radius: 12px; font-weight: bold; font-size: 18px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .btn-cat { background: #4CAF50; color: white; padding: 15px; border-radius: 10px; border: none; font-size: 18px; margin-bottom: 5px; }
+        .item-card { background: white; padding: 15px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 6px solid #01579B; }
+    </style>
 </head>
 <body>
-    <h2>Unesite kod za pristup aplikaciji</h2>
+    <div id="main-content">
+        <div class="header">
+            <h2 id="title">UČITAVANJE...</h2>
+        </div>
+        <div id="app-body" class="container"></div>
+    </div>
 
-    <input id="code" type="text" placeholder="Unesite kod">
-    <button onclick="unlock()">Pokreni</button>
-
-    <script>
-        function unlock() {
-            const input = document.getElementById("code");
-            const value = input.value.trim();
-
-            if (value === "2025") {   // validan kod
-                localStorage.setItem("ok", "1");
-                window.location.href = "app.html";
-            } else {
-                alert("Pogrešan kod");
-                input.value = "";
-                input.focus();
-            }
-        }
-
-        // Ako je već otključano – preskoči unos koda
-        if (localStorage.getItem("ok") === "1") {
-            window.location.href = "app.html";
-        }
-    </script>
+    <py-config>
+        [[fetch]]
+        files = ["./glavni_kod.py"]
+    </py-config>
+    <py-script src="./glavni_kod.py"></py-script>
 </body>
 </html>
