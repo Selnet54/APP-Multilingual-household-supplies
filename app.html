@@ -1,21 +1,50 @@
-<script>
-function unlock() {
-  const input = document.getElementById("code");
-  const value = input.value.trim();
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zalihe App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Provera da li je app otključan -->
+    <script>
+        if (localStorage.getItem("ok") !== "1") {
+            window.location.href = "index.html";
+        }
+    </script>
 
-  if (value === "ZALIHE-2025") {
-    localStorage.setItem("ok", "1");
-    window.location.href = "app.html";
-  } else {
-    alert("Pogrešan kod");
-    input.value = "";
-    input.focus();
-  }
-}
+    <h2>Zalihe hrane</h2>
 
-// Ako je već otključano – preskoči kod
-<script>
-if (localStorage.getItem("ok") !== "1") {
-  window.location.href = "index.html";
-}
-</script>
+    <!-- Forma za unos zaliha -->
+    <form id="unosForma">
+        <label for="naziv">Naziv proizvoda:</label>
+        <input type="text" id="naziv" placeholder="Unesite naziv" required>
+
+        <label for="kolicina">Količina:</label>
+        <input type="number" id="kolicina" placeholder="Unesite količinu" required>
+
+        <label for="jedinica">Jedinica:</label>
+        <select id="jedinica" required>
+            <option value="kom">kom</option>
+            <option value="kg">kg</option>
+            <option value="l">l</option>
+        </select>
+
+        <label for="rok">Rok trajanja:</label>
+        <input type="date" id="rok">
+
+        <label for="mesto">Mesto skladištenja:</label>
+        <input type="text" id="mesto" placeholder="Unesite mesto">
+
+        <button type="submit">Sačuvaj</button>
+    </form>
+
+    <!-- Lista unetih zaliha -->
+    <ul id="lista"></ul>
+
+    <!-- Učitavanje baze i logike -->
+    <script src="db.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
