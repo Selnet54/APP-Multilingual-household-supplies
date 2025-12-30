@@ -1,13 +1,23 @@
 <input id="code" placeholder="Unesite kod">
 <button onclick="unlock()">Pokreni</button>
 
-<<script>
+<script>
 function unlock() {
-  if (code.value === "2025") {
+  const input = document.getElementById("code");
+  const value = input.value.trim();
+
+  if (value === "2025") {   // tvoj novi kod
     localStorage.setItem("ok", "1");
-    location.href = "app.html";
+    window.location.href = "app.html";
   } else {
     alert("Pogrešan kod");
+    input.value = "";
+    input.focus();
   }
+}
+
+// Ako je već otključano – preskoči unos koda
+if (localStorage.getItem("ok") === "1") {
+  window.location.href = "app.html";
 }
 </script>
