@@ -14,7 +14,8 @@ function unlock() {
 }
 
 // Ako je već otključano – preskoči kod
-if (localStorage.getItem("ok") === "1") {
-  window.location.href = "app.html";
+<script>
+if (localStorage.getItem("ok") !== "1") {
+  window.location.href = "index.html";
 }
 </script>
