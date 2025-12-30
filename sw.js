@@ -1,4 +1,4 @@
-const CACHE_NAME = "zalihe-v1";
+const CACHE_NAME = "zalihe-v2";
 const urlsToCache = [
   "./",
   "./language.html",
